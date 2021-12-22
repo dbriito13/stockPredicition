@@ -1,0 +1,37 @@
+To build our LSTM neural network we will use Tensorflow's Keras functionality, the LSTM layer keras provides us with takes a series of arguments, let's observe our model and comment on them
+\begin{figure}[H]
+    \begin{minted}[bgcolor=bg,
+    fontsize=\footnotesize,
+    ]{python}
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import LSTM, Dropout, Dense
+
+
+model = Sequential()
+
+model.add(LSTM(units = 50, return_sequences=True, input_shape=(x_train.shape[1], 1)))
+model.add(Dropout(0.2))
+model.add(LSTM(units = 50, return_sequences=True))
+model.add(Dropout(0.2))
+model.add(LSTM(units = 50))
+model.add(Dropout(0.2))
+model.add(Dense(units = 1))
+    \end{minted}
+    \caption{LSTM Model}
+    \label{fig:LSTM}
+\end{figure}
+
+As we can see we added some Dropout layers to prevent our model from overfitting the training data, as well as a final dense layer with 1 unit to give a final price prediction. Now we train our model on our train dataset with the squared loss function with the code in \hyperref[fig:lstmTrain]{Figure 3.2}
+\begin{figure}[H]
+    
+    \begin{minted}[bgcolor=bg,
+    fontsize=\footnotesize,
+    ]{python}
+model.compile(optimizer='adam', loss='mean_squared_error')
+model.fit(x_train, y_train, epochs=25, batch_size=40)
+    \end{minted}
+\caption{Caption}
+    \label{fig:my_label}
+\end{figure}
+
+To test our model we will first extract the data that we didn't use to train, and then, as we did with the train data, we will rescale it, and, for each day, build a vector that contains the previous 60 days.

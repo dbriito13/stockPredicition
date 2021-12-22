@@ -1,0 +1,42 @@
+
+%% In this file we will put all the packages that we want to use as 
+%% well as some custom commands f
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsfonts, amssymb, amsmath, amsthm}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{centernot}
+\usepackage{pgfplots}
+\usepackage{subfig}
+\usepackage{svg}
+\usepackage{neuralnetwork}
+\usepackage{tikz}
+\usepackage{neuralnetwork}
+\usetikzlibrary{positioning}
+\usepackage{datetime}
+\usepackage{multicol}
+\usepackage{float}
+\usepackage{minted}
+\usemintedstyle{friendly}
+\usepackage{mathtools}
+
+% SUS PRIMITIVAS PARA DEFINIR TEOREMAS, LEMAS ETC
+%\newtheorem{teor}{Teorema}[chapter]
+%\newtheorem{lema}[teor]{Lema}
+%\newtheorem*{teorsin}{Teorema}
+%\theoremstyle{definition}
+%\newtheorem{defin}[teor]{Definici\'on}
+
+% My preliminaries to define theorems, lemmas, definitions and corollaries
+\newtheorem{theorem}{Teorema}[chapter]
+\newtheorem{lemma}[theorem]{Lema}
+\newtheorem*{theorem*}{Teorema}
+\newtheorem{corollary}{Corolario}[theorem]
+\newtheorem{prop}[theorem]{Proposición}
+\newtheorem{example}{Ejemplo}[chapter]
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definición}
+
+
+\definecolor{bg}{rgb}{0.95,0.95,0.95}

@@ -1,0 +1,86 @@
+Before building our neural network and training it we have to obtain a dataset in which to do these operations. We decided to extract the most up to date data when we run or project, to do so, we will make use of \hyperlink{https://finance.yahoo.com/}{yahoo's finance website}
+
+\section{Querying Data}
+To obtain the data from said website we will perform a GET HTTP request with parameters stock\textunderscore symbol, the symbol of the stock/ index/ ETF we want to predit, period1 and period2, the starting and ending dates between which we will retrieve stock data.
+This behaviour is reflected in the following function
+
+\begin{figure}[H]
+    \begin{minted}[
+    bgcolor=bg,
+    fontsize=\footnotesize,
+    ]{python}
+import pandas_datareader as web
+from datetime import datetime as date
+import requests
+import io
+
+def fetch_yahoo(stock_symbol, date_start, date_end):
+  headers = {
+      'User-Agent': 'Mozilla/5.0'
+  }
+
+  url = "https://query1.finance.yahoo.com/v7/finance/download/"
+  url += str(stock_symbol) #Add stock simbol to url
+  x = int(date.strptime(date_start, '%Y-%m-%d').strftime("%s"))
+  y = int(date.strptime(date_end, '%Y-%m-%d').strftime("%s"))
+  url += "?period1=" + str(x) + "&period2=" + str(y) + \
+      "&interval=1d&events=history&includeAdjustedClose=true"
+  
+  r = requests.get(url, headers=headers)
+  pds = pd.read_csv(io.StringIO(r.text), index_col=0, parse_dates=True)
+
+  return pds
+    \end{minted}
+    \caption{fucntion to fetch ticker stock data}
+    \label{fig:fetchfunction}
+\end{figure}
+
+\subsection{Preparing Data}
+Now this data returned by yahoo contains a lot of values which we won't be covering with this neural network model, we are just interested in the \textbf{closing} value of the stock's ticker.
+
+Now we reshape this data to be a column vector of only the closing values
+\begin{figure}[H]
+    \begin{minted}[
+    bgcolor=bg,
+    fontsize=\footnotesize,
+    ]{python}
+data_closing_value = data_yahoo['Close']
+data_closing_value = data_closing_value.values.reshape(-1,1)
+    \end{minted}
+    \caption{Data Reshape}
+    \label{fig:dataReshape}
+\end{figure}
+
+The next step is crucial to the learning process of our Neural Network, \textbf{Scaling} the data so it fits a standard normal distribution, generally makes our model converge faster, but why?
+
+\subsection{Data Scaling}
+Why do we need to scale the data before training our neural network? This is due to the update rule we will be working with, recall the \hyperref[eq:gradDescent]{gradient descent update rule} 
+\begin{equation*}
+    \mathbf{W,b} := \mathbf{W,b} - \mu * \partial L(\mathbf{W,b})
+\end{equation*}
+
+If we explicitly calculate the gradient of the loss function we get
+\begin{equation*}
+    \mathbf{W,b} := \mathbf{W,b} - \mu \cdot \frac{2}{n}\cdot x \cdot \sum_{i=0}^{n}(y-h_{\mathbf{W,b}(x)})
+\end{equation*}
+As we can see when calculating the derivative $x$ appeared multiplying the learning rate, which means that the rate at which we update our weights will be affected by the scale our data have, and the unit they are in, this is the reason why we rescale data.
+
+\textbf{How do we scale it?}
+
+We simply Standarise it with the following formula
+\begin{equation*}
+    \tilde{x} = \frac{x-min{x}}{max(x) - min(x)}
+\end{equation*}
+
+
+\begin{figure}[H]
+    \begin{minted}[bgcolor=bg,
+    fontsize=\footnotesize,
+    ]{python}
+from sklearn.preprocessing import MinMaxScaler
+scaler = MinMaxScaler(feature_range=(0,1))
+scaled_data_closing = scaler.fit_transform(data_closing_value)
+    \end{minted}
+    \caption{Standarisation of input data}
+    \label{fig:my_label}
+\end{figure}
